@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阿嬤的地鍋雞 | 靈魂燉煮的家常味</title>
+    <style>
+        /* --- CSS 樣式區 --- */
+        :root {
+            --primary-color: #c0392b; /* 辣椒紅 */
+            --secondary-color: #d35400; /* 燉煮橘 */
+            --text-color: #333;
+            --bg-color: #fdf6e3; /* 溫暖米色背景 */
+            --white: #fff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Microsoft JhengHei", sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; }
+
+        /* 導覽列 */
+        nav {
+            position: fixed; top: 0; width: 100%; background: rgba(255, 255, 255, 0.95);
+            padding: 15px 5%; display: flex; justify-content: space-between; align-items: center;
+            z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        .logo { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); }
+        .cta-btn {
+            background: var(--primary-color); color: var(--white); padding: 10px 20px;
+            border-radius: 30px; text-decoration: none; font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .cta-btn:hover { transform: scale(1.05); background: var(--secondary-color); }
+
+        /* Hero Section (首屏) */
+        header {
+            height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('diguoji.jpg'); /* 示意圖 */
+            background-size: cover; background-position: center; color: var(--white);
+        }
+        header h1 { font-size: 3.5rem; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); opacity: 0; animation: fadeInDown 1s forwards; }
+        header p { font-size: 1.5rem; margin-bottom: 30px; opacity: 0; animation: fadeInUp 1s 0.5s forwards; }
+
+        /* 通用區塊設定 */
+        section { padding: 80px 10%; }
+        .section-title { text-align: center; font-size: 2.5rem; margin-bottom: 50px; color: var(--secondary-color); }
+        
+        /* 故事區塊 */
+        .story-content { display: flex; flex-wrap: wrap; align-items: center; gap: 40px; }
+        .story-text { flex: 1; line-height: 1.8; font-size: 1.1rem; }
+        .story-img { flex: 1; min-width: 300px; }
+        .story-img img { width: 100%; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+        /* 特色區塊 (Grid) */
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+        .feature-card {
+            background: var(--white); padding: 30px; border-radius: 10px; text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: transform 0.3s;
+        }
+        .feature-card:hover { transform: translateY(-10px); }
+        .feature-icon { font-size: 3rem; margin-bottom: 20px; }
+
+        /* 價格與計算區塊 */
+        .menu-container { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+        .price-card {
+            background: var(--white); border: 2px solid #eee; border-radius: 15px; padding: 40px; width: 300px; text-align: center;
+            position: relative; overflow: hidden; transition: 0.3s;
+        }
+        .price-card.featured { border-color: var(--primary-color); transform: scale(1.05); }
+        .tag { position: absolute; top: 15px; right: -30px; background: var(--primary-color); color: white; padding: 5px 40px; transform: rotate(45deg); font-size: 0.8rem; }
+        .price { font-size: 2.5rem; color: var(--primary-color); font-weight: bold; margin: 20px 0; }
+        .stepper { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .stepper button { width: 30px; height: 30px; border: 1px solid #ddd; background: white; cursor: pointer; }
+        .stepper input { width: 40px; text-align: center; border: none; font-size: 1.1rem; }
+
+        /* 浮動結帳條 */
+        .sticky-summary {
+            position: fixed; bottom: -100px; left: 0; width: 100%; background: var(--white);
+            padding: 15px 10%; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1); transition: bottom 0.3s; z-index: 999;
+        }
+        .sticky-summary.active { bottom: 0; }
+        .total-price { font-size: 1.2rem; font-weight: bold; color: var(--primary-color); }
+
+        /* 動畫類別 (JS 控制) */
+        .reveal { position: relative; transform: translateY(50px); opacity: 0; transition: 1s all ease; }
+        .reveal.active { transform: translateY(0); opacity: 1; }
+
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            header h1 { font-size: 2.5rem; }
+            .sticky-summary { flex-direction: column; gap: 10px; padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">阿嬤的地鍋雞</div>
+        <a href="#order" class="cta-btn">立即訂購</a>
+    </nav>
+
+    <header>
+        <h1>暖心，藏在細節裡</h1>
+        <p>徐州風味・溫體雞肉・靈魂醬料</p>
+        <a href="#story" style="color: white; margin-top: 20px;">探索故事 ↓</a>
+    </header>
+
+    <section id="story">
+        <h2 class="section-title reveal">一道說故事的料理</h2>
+        <div class="story-content reveal">
+            <div class="story-img">
+                <img src="chicken.png" alt="地鍋雞燉煮">
+            </div>
+            <div class="story-text">
+                <p>最暖心的滋味，往往藏在細節裡。</p>
+                <br>
+                <p>我們堅持選用<strong>鮮嫩溫體雞肉</strong>，佐以靈魂辣椒與精選香料，結合主廚特製的獨門醬料。不用快火強攻，而是用溫火慢慢收汁，讓醬香滲入每一絲雞肉纖維。</p>
+                <br>
+                <p>燉出的，不只是一道菜，而是一份溫潤而飽滿的家常溫暖。在熱氣騰騰中，輕聲訴說著徐州風味的故事。</p>
+            </div>
+        </div>
+    </section>
+
+    <section style="background-color: #fff;">
+        <h2 class="section-title reveal">美味的秘密</h2>
+        <div class="features reveal">
+            <div class="feature-card">
+                <div class="feature-icon">🐔</div>
+                <h3>鮮嫩溫體雞</h3>
+                <p>拒絕冷凍口感，選用當日新鮮溫體雞肉，肉質Q彈多汁。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌶️</div>
+                <h3>靈魂辣椒</h3>
+                <p>精選香料爆炒，香氣層次豐富，辣而不燥，回味無窮。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🍜</div>
+                <h3>手工烏龍麵</h3>
+                <p>吸滿濃郁湯汁的烏龍麵，是地鍋雞不可或缺的最佳配角。</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="order">
+        <h2 class="section-title reveal">選擇您的份量</h2>
+        <div class="menu-container reveal">
+            <div class="price-card">
+                <h3>獨享包</h3>
+                <p>附贈烏龍麵 x1</p>
+                <div class="price">$250</div>
+                <p>適合 1 人享用，加班、消夜的暖心首選。</p>
+                <div class="stepper">
+                    <button onclick="updateQty('solo', -1)">-</button>
+                    <input type="text" id="qty-solo" value="0" readonly>
+                    <button onclick="updateQty('solo', 1)">+</button>
+                </div>
+            </div>
+
+            <div class="price-card featured">
+                <div class="tag">熱銷推薦</div>
+                <h3>分享包</h3>
+                <p>附贈烏龍麵 x2</p>
+                <div class="price">$450</div>
+                <p>適合 2-3 人享用，家庭聚餐、朋友小酌最對味。</p>
+                <div class="stepper">
+                    <button onclick="updateQty('share', -1)">-</button>
+                    <input type="text" id="qty-share" value="0" readonly>
+                    <button onclick="updateQty('share', 1)">+</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer style="text-align: center; padding: 50px 0; background: #333; color: #fff;">
+        <p>&copy; 2024 阿嬤的地鍋雞. All Rights Reserved.</p>
+    </footer>
+
+    <div class="sticky-summary" id="stickySummary">
+        <div>
+            <span id="summary-text">您選擇了：0 份餐點</span>
+            <div class="total-price">總計：$0</div>
+        </div>
+        <button class="cta-btn" onclick="copyOrderAndRedirect()">複製訂單並加 LINE 私訊</button>
+    </div>
+
+    <script>
+        // 1. 滾動顯示動畫 (Intersection Observer)
+        const reveals = document.querySelectorAll('.reveal');
+        
+        const revealOnScroll = () => {
+            const windowHeight = window.innerHeight;
+            const elementVisible = 150;
+
+            reveals.forEach((reveal) => {
+                const elementTop = reveal.getBoundingClientRect().top;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveal.classList.add('active');
+                }
+            });
+        };
+        window.addEventListener('scroll', revealOnScroll);
+
+        // 2. 購物車計算邏輯
+        let cart = { solo: 0, share: 0 };
+        const prices = { solo: 250, share: 450 };
+
+        function updateQty(type, change) {
+            const currentQty = cart[type];
+            const newQty = currentQty + change;
+            
+            if (newQty >= 0) {
+                cart[type] = newQty;
+                document.getElementById(`qty-${type}`).value = newQty;
+                updateSummary();
+            }
+        }
+
+        function updateSummary() {
+            const total = (cart.solo * prices.solo) + (cart.share * prices.share);
+            const totalQty = cart.solo + cart.share;
+            const summaryDiv = document.getElementById('stickySummary');
+            
+            document.getElementById('summary-text').innerText = `獨享包 ${cart.solo} 份, 分享包 ${cart.share} 份`;
+            document.querySelector('.total-price').innerText = `總計：$${total}`;
+
+            // 如果有數量，顯示下方浮動條
+            if (totalQty > 0) {
+                summaryDiv.classList.add('active');
+            } else {
+                summaryDiv.classList.remove('active');
+            }
+        }
+
+        // 3. 複製訂單並跳轉 LINE
+        function copyOrderAndRedirect() {
+            const total = (cart.solo * prices.solo) + (cart.share * prices.share);
+            const message = `你好！我要訂購地鍋雞：\n獨享包：${cart.solo} 份\n分享包：${cart.share} 份\n總金額：$${total}\n請問如何付款？`;
+            
+            // 複製到剪貼簿 (模擬體驗)
+            navigator.clipboard.writeText(message).then(() => {
+                alert("訂單內容已複製！將為您開啟 LINE，請直接貼上訊息。");
+                // 這裡請換成您的真實 LINE 連結，例如 https://line.me/ti/p/你的ID
+                window.location.href = 'https://line.me/ti/p/@yourlineid'; 
+            });
+        }
+    </script>
+</body>
+</html>
